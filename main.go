@@ -21,8 +21,30 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/tabo-syu/dummy-image-generator/cmd"
+import (
+	"os"
+
+	"github.com/tabo-syu/dummy-image-generator/cmd"
+)
+
+type exitCode int
+
+const (
+	exitOK    exitCode = 0
+	exitError exitCode = 1
+)
 
 func main() {
-	cmd.Execute()
+	code := exec()
+	os.Exit(int(code))
+}
+
+func exec() exitCode {
+	writers := &cmd.Writers{Out: os.Stdout, Err: os.Stderr}
+	rootCmd := cmd.NewRootCmd(writers)
+	if err := rootCmd.Execute(); err != nil {
+		return exitError
+	}
+
+	return exitOK
 }

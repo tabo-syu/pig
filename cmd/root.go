@@ -22,40 +22,58 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"os"
+	"fmt"
+	"io"
 
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:     "dummy-image-generator",
-	Version: "1.0.0",
-	Short:   "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	Run: func(cmd *cobra.Command, args []string) {
-		println(cmd.Version)
-	},
+type Writers struct {
+	Out io.Writer
+	Err io.Writer
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
-		os.Exit(1)
+type RootFlags struct {
+	Width    uint
+	Height   uint
+	Format   string
+	Text     string
+	Filename string
+}
+
+func NewRootCmd(w *Writers) *cobra.Command {
+	flags := &RootFlags{}
+
+	cmd := &cobra.Command{
+		Use:     "dummy-image-generator",
+		Version: "1.0.0",
+		Short:   "Generates a dummy image with the specified width, height, and other specified options.",
+		Long: `dummy-image-generator is a command line application that generates dummy images.
+This application can generate images by specifying width, height, format, file name, and text.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return root(w, flags)
+		},
 	}
+
+	cmd.Flags().SortFlags = false
+	cmd.Flags().UintVarP(&flags.Width, "width", "w", 0, "image width pixel")
+	cmd.Flags().UintVarP(&flags.Height, "height", "h", 0, "image height pixel")
+	cmd.Flags().StringVarP(&flags.Format, "format", "f", "jpg", "image format")
+	cmd.Flags().StringVarP(&flags.Text, "text", "t", "", "text to be inserted in the image (default \"{width}x{height}\")")
+	cmd.Flags().StringVarP(&flags.Filename, "filename", "n", "", "filename (default \"{width}x{height}.{format}\")")
+	cmd.Flags().Bool("help", false, "help for "+cmd.Name())
+	_ = cmd.Flags().SetAnnotation("help", cobra.FlagSetByCobraAnnotation, []string{"true"})
+
+	cmd.MarkFlagsRequiredTogether("width", "height")
+
+	return cmd
 }
 
-func init() {
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func root(w *Writers, f *RootFlags) error {
+	fmt.Fprintln(
+		w.Out,
+		f.Width, "x", f.Height, ".", f.Format,
+	)
+
+	return nil
 }
