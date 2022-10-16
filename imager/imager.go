@@ -28,6 +28,7 @@ type Input struct {
 	Height uint16
 	Format string
 	Text   string
+	Color  uint32
 }
 
 var (
@@ -47,7 +48,22 @@ func validate(input Input) error {
 		return ErrInvalidImageFormat
 	}
 
+	// Round to the maximum 32-bit value
+	if input.Color > 0xff_ff_ff_ff {
+		input.Color = 0xff_ff_ff_ff
+	}
+
 	return nil
+}
+
+// Convert color code to RGBA
+func colorCodeToRGBA(code uint32) (r, g, b, a uint8) {
+	r = uint8(code >> 24)
+	g = uint8(code >> 16)
+	b = uint8(code >> 8)
+	a = uint8(code)
+
+	return r, g, b, a
 }
 
 // Fill the image with color
@@ -79,10 +95,10 @@ func insertLabel(img *image.RGBA, color image.Image, text string) error {
 		Face: face,
 		Dot:  fixed.Point26_6{},
 	}
-	b, a := drawer.BoundString(text)
+	a := drawer.MeasureString(text)
 	drawer.Dot = fixed.Point26_6{
 		X: (fixed.I(w) - a) / 2,
-		Y: fixed.I(h+(int(b.Max.Y)/2)) / 2,
+		Y: fixed.I(h+(int(fontsize)/2)) / 2,
 	}
 
 	drawer.DrawString(text)
@@ -99,7 +115,8 @@ func Generate(input Input) (*image.RGBA, error) {
 	img := image.NewRGBA(
 		image.Rect(0, 0, int(input.Width), int(input.Height)),
 	)
-	fillColor(img, color.White)
+	r, g, b, a := colorCodeToRGBA(input.Color)
+	fillColor(img, color.RGBA{r, g, b, a})
 	insertLabel(img, image.Black, input.Text)
 
 	return img, nil

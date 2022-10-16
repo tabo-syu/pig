@@ -42,6 +42,7 @@ type RootFlags struct {
 	Height uint16
 	Format string
 	Text   string
+	Color  uint32
 }
 
 func NewRootCmd(w *Writers) *cobra.Command {
@@ -49,7 +50,7 @@ func NewRootCmd(w *Writers) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "pig",
-		Example: "pig -w 400 -h 300",
+		Example: "pig -w 400 -h 300 -f png -t placeholder -c 0xffffffff",
 		Version: "1.0.0",
 		Short:   "Generates a placeholder image with the specified width, height, and other specified options.",
 		Long: `placeholder-image-generator(p.i.g.) is a command line application that generates placeholder images.
@@ -69,6 +70,7 @@ This application can generate images by specifying width, height, format, file n
 	cmd.Flags().Uint16VarP(&flags.Height, "height", "h", 0, "image height pixel")
 	cmd.Flags().StringVarP(&flags.Format, "format", "f", "jpg", "image format")
 	cmd.Flags().StringVarP(&flags.Text, "text", "t", "", "text to be inserted in the image (default \"{width}x{height}\")")
+	cmd.Flags().Uint32VarP(&flags.Color, "color", "c", 0x00_00_00_ff, "backgournd color code (RGBA)")
 
 	cmd.Flags().Bool("help", false, "help for "+cmd.Name())
 	_ = cmd.Flags().SetAnnotation("help", cobra.FlagSetByCobraAnnotation, []string{"true"})
@@ -85,6 +87,7 @@ func Root(w *Writers, f *RootFlags) error {
 		Height: f.Height,
 		Format: f.Format,
 		Text:   f.Text,
+		Color:  f.Color,
 	})
 	if err != nil {
 		return err
