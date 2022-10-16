@@ -23,9 +23,13 @@ package cmd
 
 import (
 	"fmt"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 	"io"
 
 	"github.com/spf13/cobra"
+	"github.com/tabo-syu/dummy-image-generator/imager"
 )
 
 type Writers struct {
@@ -34,46 +38,68 @@ type Writers struct {
 }
 
 type RootFlags struct {
-	Width    uint
-	Height   uint
-	Format   string
-	Text     string
-	Filename string
+	Width  uint16
+	Height uint16
+	Format string
+	Text   string
 }
 
 func NewRootCmd(w *Writers) *cobra.Command {
 	flags := &RootFlags{}
 
 	cmd := &cobra.Command{
-		Use:     "dummy-image-generator",
+		Use:     "pig",
+		Example: "pig -w 400 -h 300",
 		Version: "1.0.0",
-		Short:   "Generates a dummy image with the specified width, height, and other specified options.",
-		Long: `dummy-image-generator is a command line application that generates dummy images.
+		Short:   "Generates a placeholder image with the specified width, height, and other specified options.",
+		Long: `placeholder-image-generator(p.i.g.) is a command line application that generates placeholder images.
 This application can generate images by specifying width, height, format, file name, and text.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return root(w, flags)
+			// Set default text
+			if flags.Text == "" {
+				flags.Text = fmt.Sprintf("%d x %d", flags.Width, flags.Height)
+			}
+
+			return Root(w, flags)
 		},
 	}
 
 	cmd.Flags().SortFlags = false
-	cmd.Flags().UintVarP(&flags.Width, "width", "w", 0, "image width pixel")
-	cmd.Flags().UintVarP(&flags.Height, "height", "h", 0, "image height pixel")
+	cmd.Flags().Uint16VarP(&flags.Width, "width", "w", 0, "image width pixel")
+	cmd.Flags().Uint16VarP(&flags.Height, "height", "h", 0, "image height pixel")
 	cmd.Flags().StringVarP(&flags.Format, "format", "f", "jpg", "image format")
 	cmd.Flags().StringVarP(&flags.Text, "text", "t", "", "text to be inserted in the image (default \"{width}x{height}\")")
-	cmd.Flags().StringVarP(&flags.Filename, "filename", "n", "", "filename (default \"{width}x{height}.{format}\")")
+
 	cmd.Flags().Bool("help", false, "help for "+cmd.Name())
 	_ = cmd.Flags().SetAnnotation("help", cobra.FlagSetByCobraAnnotation, []string{"true"})
 
-	cmd.MarkFlagsRequiredTogether("width", "height")
+	cmd.MarkFlagRequired("width")
+	cmd.MarkFlagRequired("height")
 
 	return cmd
 }
 
-func root(w *Writers, f *RootFlags) error {
-	fmt.Fprintln(
-		w.Out,
-		f.Width, "x", f.Height, ".", f.Format,
-	)
+func Root(w *Writers, f *RootFlags) error {
+	img, err := imager.Generate(imager.Input{
+		Width:  f.Width,
+		Height: f.Height,
+		Format: f.Format,
+	})
+	if err != nil {
+		return err
+	}
+
+	switch f.Format {
+	case imager.Jpg:
+		err = jpeg.Encode(w.Out, img, &jpeg.Options{})
+	case imager.Png:
+		err = png.Encode(w.Out, img)
+	case imager.Gif:
+		err = gif.Encode(w.Out, img, &gif.Options{})
+	}
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
