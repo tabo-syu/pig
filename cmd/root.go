@@ -54,7 +54,7 @@ func NewRootCmd(w *Writers) *cobra.Command {
 		Version: "1.0.0",
 		Short:   "Generates a placeholder image with the specified width, height, and other specified options.",
 		Long: `placeholder-image-generator(p.i.g.) is a command line application that generates placeholder images.
-This application can generate images by specifying width, height, format, file name, and text.`,
+This application can generate images by specifying width, height, format, background color, and text.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Set default text
 			if flags.Text == "" {
@@ -95,7 +95,7 @@ func Root(w *Writers, f *RootFlags) error {
 
 	switch f.Format {
 	case imager.Jpg:
-		err = jpeg.Encode(w.Out, img, &jpeg.Options{})
+		err = jpeg.Encode(w.Out, img, &jpeg.Options{Quality: 70})
 	case imager.Png:
 		err = png.Encode(w.Out, img)
 	case imager.Gif:
