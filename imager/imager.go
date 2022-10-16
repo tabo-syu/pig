@@ -7,6 +7,7 @@ import (
 	"image/color"
 
 	"github.com/golang/freetype/truetype"
+	"github.com/tabo-syu/dummy-image-generator/util"
 	"golang.org/x/exp/slices"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
@@ -54,16 +55,6 @@ func validate(input Input) error {
 	}
 
 	return nil
-}
-
-// Convert color code to RGBA
-func colorCodeToRGBA(code uint32) (r, g, b, a uint8) {
-	r = uint8(code >> 24)
-	g = uint8(code >> 16)
-	b = uint8(code >> 8)
-	a = uint8(code)
-
-	return r, g, b, a
 }
 
 // Fill the image with color
@@ -115,9 +106,10 @@ func Generate(input Input) (*image.RGBA, error) {
 	img := image.NewRGBA(
 		image.Rect(0, 0, int(input.Width), int(input.Height)),
 	)
-	r, g, b, a := colorCodeToRGBA(input.Color)
+	r, g, b, a := util.ColorCodeToRGBA(input.Color)
+	br, bg, bb := util.CalcColorFromBGColor(r, g, b)
 	fillColor(img, color.RGBA{r, g, b, a})
-	insertLabel(img, image.Black, input.Text)
+	insertLabel(img, image.NewUniform(color.RGBA{br, bg, bb, a}), input.Text)
 
 	return img, nil
 }
