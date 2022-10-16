@@ -97,9 +97,6 @@ func Root(w *Writers, f *RootFlags) error {
 	case imager.Gif:
 		err = gif.Encode(w.Out, img, &gif.Options{})
 	}
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
