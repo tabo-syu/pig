@@ -1,11 +1,16 @@
 package imager
 
 import (
+	_ "embed"
 	"errors"
 	"image"
 	"image/color"
 
+	"github.com/golang/freetype/truetype"
 	"golang.org/x/exp/slices"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/gofont/goregular"
+	"golang.org/x/image/math/fixed"
 )
 
 type formats []string
@@ -48,18 +53,41 @@ func validate(input Input) error {
 // Fill the image with color
 func fillColor(img *image.RGBA, c color.Color) {
 	size := img.Rect.Size()
-	width := size.X
-	height := size.Y
-	for x := 0; x < width; x++ {
-		for y := 0; y < height; y++ {
+	width, height := size.X, size.Y
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
 			img.Set(x, y, c)
 		}
 	}
 }
 
 // Insert text to image
-func insertText(img *image.RGBA, text string) {
+func insertLabel(img *image.RGBA, color image.Image, text string) error {
+	size := img.Rect.Size()
+	w, h := size.X, size.Y
 
+	ttf, err := truetype.Parse(goregular.TTF)
+	if err != nil {
+		return err
+	}
+	var fontsize float64 = 100
+	face := truetype.NewFace(ttf, &truetype.Options{Size: fontsize})
+
+	drawer := &font.Drawer{
+		Dst:  img,
+		Src:  color,
+		Face: face,
+		Dot:  fixed.Point26_6{},
+	}
+	b, a := drawer.BoundString(text)
+	drawer.Dot = fixed.Point26_6{
+		X: (fixed.I(w) - a) / 2,
+		Y: fixed.I(h+(int(b.Max.Y)/2)) / 2,
+	}
+
+	drawer.DrawString(text)
+
+	return nil
 }
 
 // Generate the placeholder image
@@ -72,7 +100,7 @@ func Generate(input Input) (*image.RGBA, error) {
 		image.Rect(0, 0, int(input.Width), int(input.Height)),
 	)
 	fillColor(img, color.White)
-	insertText(img, input.Text)
+	insertLabel(img, image.Black, input.Text)
 
 	return img, nil
 }

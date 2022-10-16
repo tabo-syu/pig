@@ -84,6 +84,7 @@ func Root(w *Writers, f *RootFlags) error {
 		Width:  f.Width,
 		Height: f.Height,
 		Format: f.Format,
+		Text:   f.Text,
 	})
 	if err != nil {
 		return err
