@@ -29,7 +29,7 @@ import (
 	"io"
 
 	"github.com/spf13/cobra"
-	"github.com/tabo-syu/dummy-image-generator/imager"
+	"github.com/tabo-syu/placeholder-image-generator/imager"
 )
 
 type Writers struct {

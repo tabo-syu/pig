@@ -1,4 +1,4 @@
-module github.com/tabo-syu/dummy-image-generator
+module github.com/tabo-syu/placeholder-image-generator
 
 go 1.19
 

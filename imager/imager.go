@@ -7,7 +7,7 @@ import (
 	"image/color"
 
 	"github.com/golang/freetype/truetype"
-	"github.com/tabo-syu/dummy-image-generator/util"
+	"github.com/tabo-syu/placeholder-image-generator/util"
 	"golang.org/x/exp/slices"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/goregular"
