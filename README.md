@@ -1,1 +1,1 @@
-# dummy-image-generator
+# placeholder-image-generator
