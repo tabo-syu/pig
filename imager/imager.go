@@ -68,33 +68,32 @@ func fillColor(img *image.RGBA, c color.Color) {
 	}
 }
 
-// Insert text to image
-func insertLabel(img *image.RGBA, color image.Image, text string) error {
+func newTextDrawer(img *image.RGBA, ttf *truetype.Font, color image.Image, text string) *font.Drawer {
 	size := img.Rect.Size()
 	w, h := size.X, size.Y
 
-	ttf, err := truetype.Parse(goregular.TTF)
-	if err != nil {
-		return err
+	var (
+		drawer    font.Drawer
+		fontsize  float64 = float64(h) * 0.75
+		textWidth int
+	)
+	for {
+		drawer.Face = truetype.NewFace(ttf, &truetype.Options{Size: fontsize})
+		textWidth = drawer.MeasureString(text).Ceil()
+		if w/2 > textWidth {
+			break
+		}
+		fontsize--
 	}
-	var fontsize float64 = 100
-	face := truetype.NewFace(ttf, &truetype.Options{Size: fontsize})
 
-	drawer := &font.Drawer{
-		Dst:  img,
-		Src:  color,
-		Face: face,
-		Dot:  fixed.Point26_6{},
-	}
-	a := drawer.MeasureString(text)
+	drawer.Dst = img
+	drawer.Src = color
 	drawer.Dot = fixed.Point26_6{
-		X: (fixed.I(w) - a) / 2,
-		Y: fixed.I(h+(int(fontsize)/2)) / 2,
+		X: fixed.I(w-textWidth) / 2,
+		Y: fixed.I(h+int(fontsize/2)) / 2,
 	}
 
-	drawer.DrawString(text)
-
-	return nil
+	return &drawer
 }
 
 // Generate the placeholder image
@@ -103,13 +102,18 @@ func Generate(input Input) (*image.RGBA, error) {
 		return nil, err
 	}
 
-	img := image.NewRGBA(
-		image.Rect(0, 0, int(input.Width), int(input.Height)),
-	)
+	ttf, err := truetype.Parse(goregular.TTF)
+	if err != nil {
+		return nil, err
+	}
+
 	r, g, b, a := util.ColorCodeToRGBA(input.Color)
 	br, bg, bb := util.CalcColorFromBGColor(r, g, b)
+
+	img := image.NewRGBA(image.Rect(0, 0, int(input.Width), int(input.Height)))
 	fillColor(img, color.RGBA{r, g, b, a})
-	insertLabel(img, image.NewUniform(color.RGBA{br, bg, bb, a}), input.Text)
+	drawer := newTextDrawer(img, ttf, image.NewUniform(color.RGBA{br, bg, bb, a}), input.Text)
+	drawer.DrawString(input.Text)
 
 	return img, nil
 }
