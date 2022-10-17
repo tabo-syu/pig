@@ -23,3 +23,9 @@ pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png
   -c, --color uint32    backgournd color code (RGBA) (default 255)
       --help            help for pig
 ```
+
+## Installation
+
+```
+go install github.com/tabo-syu/pig@latest
+```

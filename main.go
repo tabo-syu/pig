@@ -24,7 +24,7 @@ package main
 import (
 	"os"
 
-	"github.com/tabo-syu/placeholder-image-generator/cmd"
+	"github.com/tabo-syu/pig/cmd"
 )
 
 type exitCode int

@@ -1,4 +1,4 @@
-module github.com/tabo-syu/placeholder-image-generator
+module github.com/tabo-syu/pig
 
 go 1.19
 
