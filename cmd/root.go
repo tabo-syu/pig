@@ -50,9 +50,9 @@ func NewRootCmd(w *Writers) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "pig",
-		Example: "pig -w 400 -h 300 -f png -t placeholder -c 0xffffffff > output.png",
+		Example: "pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png",
 		Version: "1.0.0",
-		Short:   "Generates a placeholder image with the specified width, height, and other specified options.",
+		Short:   "Generates a placeholder image with the specified width, height, and other options.",
 		Long: `placeholder-image-generator(p.i.g.) is a command line application that generates placeholder images.
 This application can generate images by specifying width, height, format, background color, and text.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
