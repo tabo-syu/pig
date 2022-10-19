@@ -159,3 +159,78 @@ func TestCalcColorFromBGColor(t *testing.T) {
 		})
 	}
 }
+
+func TestGrayscale(t *testing.T) {
+	type args struct {
+		ir uint8
+		ig uint8
+		ib uint8
+	}
+	type testcase struct {
+		name  string
+		args  args
+		wantR uint8
+		wantG uint8
+		wantB uint8
+	}
+	tests := []testcase{
+		{
+			name: "Test white",
+			args: args{
+				ir: 255,
+				ig: 255,
+				ib: 255,
+			},
+			wantR: 255,
+			wantG: 255,
+			wantB: 255,
+		},
+		{
+			name: "Test red",
+			args: args{
+				ir: 255,
+				ig: 0,
+				ib: 0,
+			},
+			wantR: 76,
+			wantG: 76,
+			wantB: 76,
+		},
+		{
+			name: "Test green",
+			args: args{
+				ir: 0,
+				ig: 255,
+				ib: 0,
+			},
+			wantR: 149,
+			wantG: 149,
+			wantB: 149,
+		},
+		{
+			name: "Test blue",
+			args: args{
+				ir: 0,
+				ig: 0,
+				ib: 255,
+			},
+			wantR: 29,
+			wantG: 29,
+			wantB: 29,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotR, gotG, gotB := Grayscale(tt.args.ir, tt.args.ig, tt.args.ib)
+			if gotR != tt.wantR {
+				t.Errorf("Grayscale() gotR = %v, want %v", gotR, tt.wantR)
+			}
+			if gotG != tt.wantG {
+				t.Errorf("Grayscale() gotG = %v, want %v", gotG, tt.wantG)
+			}
+			if gotB != tt.wantB {
+				t.Errorf("Grayscale() gotB = %v, want %v", gotB, tt.wantB)
+			}
+		})
+	}
+}
