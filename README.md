@@ -4,14 +4,17 @@ placeholder-image-generator(p.i.g.) is a command line application that generates
 This application can generate images by specifying width, height, format, background color, and text.
 
 ```
-pig [flags]
+$ pig [flags]
 ```
 
 ## Examples
 
+```bash
+$ pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png
 ```
-pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png
-```
+
+Result:
+![Result image](https://user-images.githubusercontent.com/45633620/207982130-8bb9d310-e57a-44ad-814c-3f027f8bd047.png)
 
 ## Options
 
@@ -26,6 +29,6 @@ pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png
 
 ## Installation
 
-```
-go install github.com/tabo-syu/pig@latest
+```bash
+$ go install github.com/tabo-syu/pig@latest
 ```
