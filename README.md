@@ -10,7 +10,7 @@ $ pig [flags]
 ## Examples
 
 ```bash
-$ pig -w 400 -h 300 -f png -t placeholder -c 0xff_ff_ff_ff > output.png
+$ pig -w 400 -h 300 -f png -t placeholder -c 0x21_3a_70_ff > output.png
 ```
 
 Result:  
