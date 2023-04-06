@@ -6,7 +6,7 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/spf13/cobra v1.6.1
 	golang.org/x/exp v0.0.0-20221012211006-4de253d81b95
-	golang.org/x/image v0.6.0
+	golang.org/x/image v0.7.0
 )
 
 require (
